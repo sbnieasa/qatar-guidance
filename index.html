@@ -3,215 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة منصة إرشاد قطر</title>
+    <title>منصة إرشاد قطر الأكاديمية - النسخة الشاملة</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <style>
-        :root { --primary: #8D1B3D; --gold: #b2945e; --bg: #f8f9fa; }
+        :root { --primary: #8D1B3D; --gold: #b2945e; --bg: #f4f7f9; }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background-color: var(--bg); margin: 0; display: flex; direction: rtl; }
 
-        .sidebar { width: 280px; background: white; height: 100vh; position: fixed; right: 0; top: 0; box-shadow: -2px 0 15px rgba(0,0,0,0.1); z-index: 1000; }
-        .sidebar-header { background: var(--primary); color: white; padding: 20px; text-align: center; cursor: pointer; }
-        .sidebar-menu a { display: block; padding: 15px 25px; color: #333; text-decoration: none; border-bottom: 1px solid #eee; cursor: pointer; }
+        /* Sidebar */
+        .sidebar { width: 280px; background: white; height: 100vh; position: fixed; right: 0; top: 0; box-shadow: -2px 0 10px rgba(0,0,0,0.1); z-index: 1000; overflow-y: auto; }
+        .sidebar-header { background: var(--primary); color: white; padding: 20px; text-align: center; }
+        .sidebar-menu a { display: block; padding: 15px 25px; color: #333; text-decoration: none; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.3s; }
         .sidebar-menu a:hover { background: #fdf2f5; color: var(--primary); }
 
+        /* Main Content */
         .main-content { margin-right: 280px; width: calc(100% - 280px); padding: 40px; }
-        .hero { background: linear-gradient(45deg, var(--primary), #5d1228); color: white; padding: 50px; border-radius: 20px; text-align: center; }
+        .hero { background: var(--primary); color: white; padding: 40px; border-radius: 20px; text-align: center; margin-bottom: 30px; }
 
+        /* Modals */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; }
-        .modal-content { background: white; width: 90%; max-width: 800px; padding: 30px; border-radius: 15px; position: relative; max-height: 85vh; overflow-y: auto; }
-        
-        .admin-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .stat-badge { display: inline-block; padding: 5px 15px; background: var(--primary); color: white; border-radius: 20px; font-size: 14px; }
-        
-        .btn { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; }
+        .modal-content { background: white; width: 90%; max-width: 800px; padding: 30px; border-radius: 20px; position: relative; max-height: 85vh; overflow-y: auto; }
+        .close-btn { position: absolute; left: 20px; top: 15px; cursor: pointer; font-size: 25px; color: #666; }
 
-        /* Floating Bot */
-        .bot-container { position: fixed; bottom: 25px; left: 25px; z-index: 9999; }
-        .bot-btn { width: 60px; height: 60px; background: var(--primary); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        /* Elements */
+        .uni-card { border-right: 5px solid var(--primary); background: #f9f9f9; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+        .btn { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
+        .stat-box { background: #eee; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 10px; }
+
+        /* Bot */
+        .bot-container { position: fixed; bottom: 20px; left: 20px; z-index: 10000; }
+        .bot-window { display: none; width: 320px; height: 450px; background: white; border-radius: 15px; flex-direction: column; box-shadow: 0 5px 25px rgba(0,0,0,0.2); overflow: hidden; }
+        .bot-header { background: var(--primary); color: white; padding: 15px; display: flex; justify-content: space-between; }
+        .bot-msgs { flex: 1; padding: 15px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
         <div class="sidebar-header" onclick="adminLogin()">
-            <h2 style="margin:0;">بوصلة قطر 🛡️</h2>
-            <small>اضغط هنا لدخول المسؤول</small>
+            <h3>بوصلة قطر 🇶🇦</h3>
+            <small>الإرشاد الأكاديمي والمهني</small>
         </div>
         <div class="sidebar-menu">
             <a onclick="showM('uniModal')">🏛️ الجامعات والتخصصات</a>
-            <a onclick="showM('scholarshipModal')">✈️ أنواع الابتعاث</a>
-            <a onclick="showM('quizModal')">🧠 اختبار الميول</a>
+            <a onclick="showM('quizModal'); startQuiz();">🧠 اختبار الميول (15 سؤال)</a>
+            <a onclick="showM('examsModal')">📝 الاختبارات المعيارية</a>
+            <a onclick="showM('scholarshipModal')">✈️ الابتعاث الحكومي</a>
             <a onclick="showM('bookingModal')">📅 حجز موعد</a>
         </div>
     </div>
 
     <div class="main-content">
-        <div id="userView">
-            <div class="hero">
-                <h1>مستقبلك يبدأ من هنا</h1>
-                <p>المنصة الوطنية للإرشاد الأكاديمي للطلاب في قطر</p>
-            </div>
+        <div class="hero">
+            <h1>مرحباً بك في مستقبل قطر الأكاديمي</h1>
+            <p>منصة شاملة تربط ميولك الشخصية بالجامعات المحلية المتاحة</p>
         </div>
-
-        <div id="adminView" style="display:none;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2 style="color:var(--primary);">📊 لوحة تحكم المسؤول</h2>
-                <button onclick="location.reload()" style="padding:5px 15px;">تسجيل خروج</button>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+            <div style="background:white; padding:20px; border-radius:15px; border-top:5px solid var(--gold);">
+                <h4>آخر التحديثات</h4>
+                <p>تم تحديث قائمة التخصصات بناءً على بيانات وزارة التربية والتعليم 2026.</p>
             </div>
-            <div class="admin-card">
-                <h3>👥 إحصائيات سريعة</h3>
-                <p>عدد الاختبارات المكتملة: <b id="statCount">جاري التحميل...</b></p>
-            </div>
-            <div class="admin-card">
-                <h3>📅 المواعيد المحجوزة</h3>
-                <div id="bookingList">لا توجد مواعيد حالياً</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="quizModal" class="modal">
-        <div class="modal-content" id="quizPrint">
-            <span onclick="hideM('quizModal')" style="cursor:pointer; float:left;">✕</span>
-            <div id="quizBody">
-                <h2 id="qNum" style="text-align:center; color:var(--primary);"></h2>
-                <p id="qText" style="font-size:1.5rem; text-align:center; margin:40px 0;"></p>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn" style="background:green;" onclick="handleAns(1)">أوافق ✅</button>
-                    <button class="btn" style="background:#777;" onclick="handleAns(0)">لا أوافق ❌</button>
-                </div>
-            </div>
-            <div id="resBody" style="display:none; text-align:center;">
-                <h2 id="resType"></h2>
-                <p id="resDesc"></p>
-                <button class="btn" onclick="saveAndPrint()">حفظ النتيجة وPDF 📥</button>
+            <div style="background:white; padding:20px; border-radius:15px; border-top:5px solid var(--primary);">
+                <h4>الاختبارات</h4>
+                <p>تأكد من مواعيد اختبارات الـ IELTS والـ SAT للقبول المبكر.</p>
             </div>
         </div>
     </div>
 
     <div id="uniModal" class="modal">
         <div class="modal-content">
-            <span onclick="hideM('uniModal')" style="cursor:pointer; float:left;">✕</span>
-            <h2>🏛️ دليل الجامعات المحلية</h2>
-            <div style="background:#eee; padding:15px; border-radius:10px; margin-bottom:10px;">
-                <b>جامعة قطر:</b> تخصصات الطب، الهندسة، القانون. التقديم: مارس 2026.
+            <span class="close-btn" onclick="hideM('uniModal')">✕</span>
+            <h2 style="color:var(--primary);">🏛️ دليل التخصصات الرسمي</h2>
+            
+            <div class="uni-card">
+                <b>جامعة قطر:</b> تشمل كليات الآداب، الإدارة، التربية، الهندسة، القانون، الشريعة، والعلوم الصحية والطب.
             </div>
-            <div style="background:#eee; padding:15px; border-radius:10px; margin-bottom:10px;">
-                <b>المدينة التعليمية (QF):</b> تكساس، كارنيجي ميلون، نورثويسترن.
+            <div class="uni-card">
+                <b>جامعة الدوحة (UDST):</b> تخصصات الهندسة، الحوسبة، الأعمال، والعلوم الصحية (مثل هندسة الطيران والأمن السيبراني).
             </div>
-            <a href="https://www.qu.edu.qa" target="_blank" class="btn" style="text-decoration:none; display:block; text-align:center;">موقع جامعة قطر الرسمي</a>
+            <div class="uni-card">
+                <b>جامعة لوسيل:</b> الابتكار، القانون، الذكاء الاصطناعي، وتدريس اللغة الإنجليزية.
+            </div>
+            <div class="uni-card">
+                <b>المدينة التعليمية:</b> تضم كارنيجي ميلون، وايل كورنيل، وجورجتاون بتخصصات عالمية.
+            </div>
         </div>
     </div>
 
-    <div id="bookingModal" class="modal">
+    <div id="examsModal" class="modal">
         <div class="modal-content">
-            <span onclick="hideM('bookingModal')" style="cursor:pointer; float:left;">✕</span>
-            <h2>📅 حجز موعد إرشادي</h2>
-            <input type="text" id="bName" placeholder="اسم الطالب">
-            <input type="date" id="bDate">
-            <button class="btn" onclick="saveBooking()">تأكيد الحجز</button>
+            <span class="close-btn" onclick="hideM('examsModal')">✕</span>
+            <h2 style="color:var(--primary);">📝 الاختبارات المعيارية المطلوبة</h2>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <div class="stat-box"><b>IELTS / TOEFL</b><br>مطلوب للغة الإنجليزية</div>
+                <div class="stat-box"><b>SAT / ACT</b><br>مطلوب للتخصصات العلمية</div>
+                <div class="stat-box"><b>QAT</b><br>اختبار القبول لجامعة قطر</div>
+                <div class="stat-box"><b>UKAT</b><br>للتخصصات الطبية</div>
+            </div>
         </div>
     </div>
 
-    <div class="bot-container">
-        <div class="bot-btn" onclick="alert('أهلاً! أنا المرشد الذكي، قريباً سأتمكن من الإجابة على استفساراتك بشكل أعمق.')">💬</div>
-    </div>
-
-    <script>
-        // 1. Firebase Configuration
-        const firebaseConfig = { apiKey: "AIzaSyBJCDzV7vPqNDMOfcb1p9gR6x8qi3QMjn8", projectId: "guidance-qatar" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        // 2. Modals Control
-        function showM(id) { document.getElementById(id).style.display = 'flex'; }
-        function hideM(id) { document.getElementById(id).style.display = 'none'; }
-
-        // 3. Quiz Logic (15 Questions)
-        const questions = [
-            {t: "هل تحب فك وإصلاح الآلات؟", s: "واقعي"},
-            {t: "هل تحب حل المسائل العلمية؟", s: "استقصائي"},
-            {t: "هل تستهويك الفنون؟", s: "فني"},
-            {t: "هل تجد متعة في مساعدة الآخرين؟", s: "اجتماعي"},
-            {t: "هل تطمح لقيادة المشاريع؟", s: "مبادر"},
-            {t: "هل تفضل العمل المكتبي المنظم؟", s: "تقليدي"},
-            {t: "هل تحب العمل الميداني؟", s: "واقعي"},
-            {t: "هل تحب إجراء التجارب؟", s: "استقصائي"},
-            {t: "هل تعتبر نفسك مبدعاً؟", s: "فني"},
-            {t: "هل تحب العمل التطوعي؟", s: "اجتماعي"},
-            {t: "هل تحب إقناع الناس؟", s: "مبادر"},
-            {t: "هل أنت دقيق في الأرقام؟", s: "تقليدي"},
-            {t: "هل تستخدم أدوات يدوية؟", s: "واقعي"},
-            {t: "هل تحب دراسة الطبيعة؟", s: "استقصائي"},
-            {t: "هل تستمتع بتنظيم الملفات؟", s: "تقليدي"}
-        ];
-        let cur = 0; let scores = {};
-        function updateQ() {
-            document.getElementById('qNum').innerText = `سؤال ${cur+1}/15`;
-            document.getElementById('qText').innerText = questions[cur].t;
-        }
-        function handleAns(v) {
-            if(v===1) scores[questions[cur].s] = (scores[questions[cur].s]||0)+1;
-            cur++;
-            if(cur < 15) updateQ(); else showRes();
-        }
-        function showRes() {
-            document.getElementById('quizBody').style.display='none';
-            document.getElementById('resBody').style.display='block';
-            let top = Object.keys(scores).reduce((a,b)=> scores[a]>scores[b]?a:b, "اجتماعي");
-            document.getElementById('resType').innerText = "نمطك: " + top;
-            document.getElementById('resDesc').innerText = "أنت شخص تميل للمجالات الـ" + top + "ة. تم تسجيل نتيجتك في قاعدة البيانات.";
-        }
-        updateQ();
-
-        // 4. Data Saving
-        function saveAndPrint() {
-            db.collection("results").add({ type: document.getElementById('resType').innerText, date: new Date() });
-            html2pdf().from(document.getElementById('quizPrint')).save('Result.pdf');
-        }
-
-        function saveBooking() {
-            const name = document.getElementById('bName').value;
-            const date = document.getElementById('bDate').value;
-            if(!name || !date) return alert("يرجى ملء البيانات");
-            db.collection("bookings").add({ name, date }).then(()=>{
-                alert("تم الحجز بنجاح!");
-                hideM('bookingModal');
-            });
-        }
-
-        // 5. Admin Panel Logic
-        function adminLogin() {
-            let pass = prompt("أدخل كلمة مرور المسؤول:");
-            if(pass === "admin123") {
-                document.getElementById('userView').style.display = 'none';
-                document.getElementById('adminView').style.display = 'block';
-                loadAdminData();
-            } else {
-                alert("كلمة مرور خاطئة");
-            }
-        }
-
-        function loadAdminData() {
-            // جلب عدد الاختبارات
-            db.collection("results").get().then(snap => {
-                document.getElementById('statCount').innerText = snap.size + " طالب";
-            });
-            // جلب المواعيد
-            db.collection("bookings").orderBy("date").get().then(snap => {
-                const list = document.getElementById('bookingList');
-                list.innerHTML = "";
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    list.innerHTML += `<div style="border-bottom:1px solid #eee; padding:10px;">👤 ${d.name} | 📅 ${d.date}</div>`;
-                });
-            });
-        }
-    </script>
-</body>
-</html>
+    <div id="quiz
