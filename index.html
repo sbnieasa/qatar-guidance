@@ -91,28 +91,28 @@
             <h2 style="color:var(--primary); text-align:center;">🏛️ دليل الجامعات والكليات في قطر</h2>
             
             <div class="uni-card">
-                <span class="uni-title">جامعة قطر</span>
-                <small>الآداب، العلوم، الإدارة والاقتصاد، القانون، التربية، الهندسة، الشريعة، العلوم الصحية، الصيدلة، والطب.</small>
+                <span class="uni-title">جامعة قطر [cite: 5]</span>
+                <small>الآداب، العلوم، الإدارة والاقتصاد، القانون، التربية، الهندسة، الشريعة، العلوم الصحية، الصيدلة، والطب[cite: 6, 7, 8, 9, 10, 11, 12].</small>
             </div>
 
             <div class="uni-card">
-                <span class="uni-title">جامعة الدوحة للعلوم والتكنولوجيا</span>
-                <small>هندسة الطيران، الأمن السيبراني، الذكاء الاصطناعي، الهندسة البحرية، والتكنولوجيا المصرفية.</small>
+                <span class="uni-title">جامعة الدوحة للعلوم والتكنولوجيا [cite: 13]</span>
+                <small>هندسة الطيران، الأمن السيبراني، الذكاء الاصطناعي، الهندسة البحرية، والتكنولوجيا المصرفية[cite: 14, 15, 16].</small>
             </div>
 
             <div class="uni-card">
-                <span class="uni-title">جامعة لوسيل</span>
-                <small>الابتكار، ريادة الأعمال، القانون، الإرشاد النفسي، الأمن السيبراني، وتصميم الألعاب الإلكترونية.</small>
+                <span class="uni-title">جامعة لوسيل [cite: 19]</span>
+                <small>الابتكار، ريادة الأعمال، القانون، الإرشاد النفسي، الأمن السيبراني، وتصميم الألعاب الإلكترونية[cite: 20, 21, 22].</small>
             </div>
 
             <div class="uni-card">
-                <span class="uni-title">أكاديمية قطر لعلوم الطيران</span>
-                <small>تدريب الطيارين، مراقبة جوية، هندسة صيانة الطائرات، والأرصاد الجوية.</small>
+                <span class="uni-title">أكاديمية قطر لعلوم الطيران [cite: 29]</span>
+                <small>تدريب الطيارين، مراقبة جوية، هندسة صيانة الطائرات، والأرصاد الجوية[cite: 30].</small>
             </div>
 
             <div class="uni-card">
-                <span class="uni-title">الجامعات العالمية (المدينة التعليمية)</span>
-                <small>كارنيجي ميلون (حاسوب)، وايل كورنيل (طب)، تكساس A&M (هندسة)، جورجتاون (سياسة)، وفيرجينيا كومنولث (فنون).</small>
+                <span class="uni-title">الجامعات العالمية (المدينة التعليمية) [cite: 33]</span>
+                <small>كارنيجي ميلون (حاسوب)، وايل كورنيل (طب)، تكساس A&M (هندسة)، جورجتاون (سياسة)، وفيرجينيا كومنولث (فنون)[cite: 34, 35, 36, 40, 41].</small>
             </div>
         </div>
     </div>
@@ -125,4 +125,100 @@
                 <p id="qText" style="font-size:1.4rem; text-align:center; margin:40px 0;"></p>
                 <div style="display:flex; gap:10px;">
                     <button class="btn" style="background:#28a745;" onclick="processAns(1)">أوافق ✅</button>
-                    <button class="btn" style
+                    <button class="btn" style="background:#6c757d;" onclick="processAns(0)">لا أوافق ❌</button>
+                </div>
+            </div>
+            <div id="resBody" style="display:none; text-align:center;">
+                <h2 id="resType" style="color:var(--primary);"></h2>
+                <p id="resDesc" style="line-height:1.6;"></p>
+                <button class="btn" onclick="html2pdf().from(document.getElementById('quizPrint')).save('My_Career_Path.pdf')">حفظ النتيجة PDF 📥</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="examsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="hideM('examsModal')">✕</span>
+            <h2 style="color:var(--primary);">📝 دليل الاختبارات المعيارية</h2>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <div class="uni-card"><b>IELTS / TOEFL</b><br>متطلب أساسي للقبول في معظم الجامعات (مستوى 5.5 فأعلى).</div>
+                <div class="uni-card"><b>SAT / ACT</b><br>مطلوب لكليات الهندسة والعلوم في جامعة قطر والمدينة التعليمية.</div>
+                <div class="uni-card"><b>UKAT / MCAT</b><br>اختبارات تخصصية للطلاب الراغبين في دراسة الطب.</div>
+                <div class="uni-card"><b>QAT</b><br>اختبار تحديد المستوى الخاص بجامعة قطر.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="scholarshipModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="hideM('scholarshipModal')">✕</span>
+            <h2 style="color:var(--primary);">✈️ برنامج الابتعاث الحكومي</h2>
+            <p>يدعم البرنامج الطلاب القطريين للدراسة في الخارج أو في الجامعات المحلية ضمن قائمة التخصصات المستهدفة.</p>
+            <a href="https://scholarship.edu.gov.qa/" target="_blank" class="btn" style="text-decoration:none; display:block; text-align:center;">بوابة الابتعاث الرسمية 🔗</a>
+        </div>
+    </div>
+
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="hideM('bookingModal')">✕</span>
+            <h2>📅 حجز موعد مع المرشد</h2>
+            <input type="text" placeholder="اسم الطالب" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;">
+            <input type="date" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;">
+            <button class="btn" onclick="alert('تم استلام طلبك! سنتواصل معك قريباً.'); hideM('bookingModal')">تأكيد الحجز</button>
+        </div>
+    </div>
+
+    <div class="bot-container">
+        <div class="bot-window" id="botWin">
+            <div class="bot-header"><span>المرشد الذكي 🤖</span><span onclick="toggleBot()" style="cursor:pointer">✕</span></div>
+            <div class="bot-msgs" id="msgs">
+                <div class="m-bot">مرحباً بك! يمكنني مساعدتك في استفسارات الجامعات والابتعاث. هل لديك سؤال محدد؟</div>
+            </div>
+            <div style="display:flex; padding:10px; border-top:1px solid #eee;">
+                <input type="text" id="botIn" placeholder="اكتب سؤالك..." style="flex:1; border:1px solid #ddd; padding:8px; border-radius:5px;" onkeypress="if(event.key==='Enter') sendBot()">
+                <button onclick="sendBot()" style="background:var(--primary); color:white; border:none; padding:5px 10px; border-radius:5px; margin-right:5px; cursor:pointer;">></button>
+            </div>
+        </div>
+        <div style="width:65px; height:65px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; cursor:pointer; font-size:30px; box-shadow: 0 5px 20px rgba(0,0,0,0.3);" onclick="toggleBot()">💬</div>
+    </div>
+
+    <script>
+        function showM(id) { document.getElementById(id).style.display = 'flex'; }
+        function hideM(id) { document.getElementById(id).style.display = 'none'; }
+        function toggleBot() { const w = document.getElementById('botWin'); w.style.display = w.style.display==='flex'?'none':'flex'; }
+
+        // محرك البوت
+        function sendBot() {
+            const i = document.getElementById('botIn'); const m = document.getElementById('msgs');
+            if(!i.value) return;
+            m.innerHTML += `<div class="m-user">${i.value}</div>`;
+            let r = "سؤال ممتاز! يمكنك العثور على تفاصيل أدق في القائمة الجانبية، أو حجز موعد مع المرشد.";
+            if(i.value.includes("جامعة قطر")) r = "جامعة قطر هي الجامعة الوطنية وتضم كليات الهندسة، الطب، والإدارة وتخصصات أخرى عديدة[cite: 5, 12].";
+            if(i.value.includes("موعد") || i.value.includes("مقابلة")) { r = "بالتأكيد! قمت بفتح نافذة الحجز لك الآن."; showM('bookingModal'); }
+            setTimeout(() => { m.innerHTML += `<div class="m-bot">${r}</div>`; m.scrollTop=m.scrollHeight; }, 600);
+            i.value = "";
+        }
+
+        // اختبار الميول (15 سؤال)
+        const questions = [
+            {t: "هل تحب فك وإصلاح الأجهزة؟", s: "واقعي"}, {t: "هل تحب حل المسائل العلمية؟", s: "استقصائي"}, {t: "هل تستهويك الفنون؟", s: "فني"},
+            {t: "هل تحب مساعدة الناس؟", s: "اجتماعي"}, {t: "هل تطمح لإدارة المشاريع؟", s: "مبادر"}, {t: "هل تحب العمل المنظم؟", s: "تقليدي"},
+            {t: "هل تحب العمل الميداني؟", s: "واقعي"}, {t: "هل تحب إجراء التجارب؟", s: "استقصائي"}, {t: "هل تعتبر نفسك مبدعاً؟", s: "فني"},
+            {t: "هل تحب العمل التطوعي؟", s: "اجتماعي"}, {t: "هل تحب إقناع الناس؟", s: "مبادر"}, {t: "هل أنت دقيق في الأرقام؟", s: "تقليدي"},
+            {t: "هل تستخدم الأدوات اليدوية؟", s: "واقعي"}, {t: "هل تحب دراسة الطبيعة؟", s: "استقصائي"}, {t: "هل تستمتع بتنظيم الملفات؟", s: "تقليدي"}
+        ];
+        let cur = 0; let scores = {};
+        function startQuiz() { cur=0; scores={}; document.getElementById('quizBody').style.display='block'; document.getElementById('resBody').style.display='none'; updateQ(); }
+        function updateQ() { document.getElementById('qNum').innerText=`سؤال ${cur+1}/15`; document.getElementById('qText').innerText=questions[cur].t; }
+        function processAns(v) { if(v===1) scores[questions[cur].s]=(scores[questions[cur].s]||0)+1; cur++; if(cur<15) updateQ(); else showR(); }
+        function showR() {
+            document.getElementById('quizBody').style.display='none'; document.getElementById('resBody').style.display='block';
+            let top = Object.keys(scores).reduce((a,b)=>scores[a]>scores[b]?a:b, "اجتماعي");
+            document.getElementById('resType').innerText = "نمطك السائد هو: " + top;
+            document.getElementById('resDesc').innerText = `بناءً على ميولك الـ ${top}ة، ننصحك باستكشاف التخصصات التي تتناسب مع هذا النمط في الدليل الجامعي.`;
+        }
+
+        function adminLogin() { if(prompt("رمز المسؤول:") === "admin123") alert("مرحباً بك!"); }
+    </script>
+</body>
+</html>
