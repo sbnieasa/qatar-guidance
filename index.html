@@ -3,47 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة إرشاد قطر الأكاديمية - النسخة الشاملة</title>
-    
+    <title>منصة إرشاد قطر الأكاديمية</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
     <style>
         :root { --primary: #8D1B3D; --gold: #b2945e; --bg: #f4f7f9; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg); margin: 0; display: flex; direction: rtl; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background-color: var(--bg); margin: 0; display: flex; direction: rtl; overflow-x: hidden; }
 
         /* Sidebar */
-        .sidebar { width: 280px; background: white; height: 100vh; position: fixed; right: 0; top: 0; box-shadow: -2px 0 10px rgba(0,0,0,0.1); z-index: 1000; overflow-y: auto; }
-        .sidebar-header { background: var(--primary); color: white; padding: 20px; text-align: center; }
-        .sidebar-menu a { display: block; padding: 15px 25px; color: #333; text-decoration: none; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.3s; }
-        .sidebar-menu a:hover { background: #fdf2f5; color: var(--primary); }
+        .sidebar { width: 280px; background: white; height: 100vh; position: fixed; right: 0; top: 0; box-shadow: -2px 0 15px rgba(0,0,0,0.1); z-index: 1000; overflow-y: auto; }
+        .sidebar-header { background: var(--primary); color: white; padding: 25px 15px; text-align: center; cursor: pointer; }
+        .sidebar-menu a { display: block; padding: 16px 25px; color: #333; text-decoration: none; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.3s; font-weight: 500; }
+        .sidebar-menu a:hover { background: #fdf2f5; color: var(--primary); padding-right: 35px; }
 
         /* Main Content */
-        .main-content { margin-right: 280px; width: calc(100% - 280px); padding: 40px; }
-        .hero { background: var(--primary); color: white; padding: 40px; border-radius: 20px; text-align: center; margin-bottom: 30px; }
+        .main-content { margin-right: 280px; width: calc(100% - 280px); padding: 20px 40px; min-height: 100vh; }
+        
+        /* News Ticker */
+        .ticker-wrap { background: #333; color: white; padding: 10px; margin-bottom: 20px; border-radius: 10px; overflow: hidden; }
+        .ticker { display: inline-block; white-space: nowrap; animation: marquee 20s linear infinite; }
+        @keyframes marquee { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+        .hero { background: linear-gradient(45deg, var(--primary), #5d1228); color: white; padding: 50px; border-radius: 20px; text-align: center; box-shadow: 0 10px 20px rgba(141, 27, 61, 0.2); }
 
         /* Modals */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; }
-        .modal-content { background: white; width: 90%; max-width: 800px; padding: 30px; border-radius: 20px; position: relative; max-height: 85vh; overflow-y: auto; }
-        .close-btn { position: absolute; left: 20px; top: 15px; cursor: pointer; font-size: 25px; color: #666; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-content { background: white; width: 90%; max-width: 850px; padding: 35px; border-radius: 20px; position: relative; max-height: 85vh; overflow-y: auto; border-top: 10px solid var(--primary); }
+        .close-btn { position: absolute; left: 25px; top: 20px; cursor: pointer; font-size: 30px; color: #999; }
 
-        /* Elements */
-        .uni-card { border-right: 5px solid var(--primary); background: #f9f9f9; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
-        .btn { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
-        .stat-box { background: #eee; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 10px; }
+        /* Info Cards */
+        .uni-card { background: #f8f9fa; border-right: 5px solid var(--primary); padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+        .uni-title { color: var(--primary); font-weight: bold; font-size: 1.2rem; display: block; margin-bottom: 5px; }
+        .btn { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
 
-        /* Bot */
-        .bot-container { position: fixed; bottom: 20px; left: 20px; z-index: 10000; }
-        .bot-window { display: none; width: 320px; height: 450px; background: white; border-radius: 15px; flex-direction: column; box-shadow: 0 5px 25px rgba(0,0,0,0.2); overflow: hidden; }
-        .bot-header { background: var(--primary); color: white; padding: 15px; display: flex; justify-content: space-between; }
-        .bot-msgs { flex: 1; padding: 15px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
+        /* Chat Bot */
+        .bot-container { position: fixed; bottom: 30px; left: 30px; z-index: 10000; }
+        .bot-window { display: none; width: 330px; height: 460px; background: white; border-radius: 20px; flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,0.2); overflow: hidden; border: 1px solid #ddd; }
+        .bot-header { background: var(--primary); color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; }
+        .bot-msgs { flex: 1; padding: 15px; overflow-y: auto; background: #f9f9f9; display: flex; flex-direction: column; gap: 10px; }
+        .m-bot { background: #eee; padding: 10px; border-radius: 12px; align-self: flex-start; max-width: 80%; font-size: 14px; }
+        .m-user { background: var(--primary); color: white; padding: 10px; border-radius: 12px; align-self: flex-end; max-width: 80%; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
         <div class="sidebar-header" onclick="adminLogin()">
-            <h3>بوصلة قطر 🇶🇦</h3>
+            <h2 style="margin:0;">بوصلة قطر 🇶🇦</h2>
             <small>الإرشاد الأكاديمي والمهني</small>
         </div>
         <div class="sidebar-menu">
@@ -51,24 +57,30 @@
             <a onclick="showM('quizModal'); startQuiz();">🧠 اختبار الميول (15 سؤال)</a>
             <a onclick="showM('examsModal')">📝 الاختبارات المعيارية</a>
             <a onclick="showM('scholarshipModal')">✈️ الابتعاث الحكومي</a>
-            <a onclick="showM('bookingModal')">📅 حجز موعد</a>
+            <a onclick="showM('bookingModal')">📅 حجز جلسة إرشادية</a>
         </div>
     </div>
 
     <div class="main-content">
-        <div class="hero">
-            <h1>مرحباً بك في مستقبل قطر الأكاديمي</h1>
-            <p>منصة شاملة تربط ميولك الشخصية بالجامعات المحلية المتاحة</p>
-        </div>
-        
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-            <div style="background:white; padding:20px; border-radius:15px; border-top:5px solid var(--gold);">
-                <h4>آخر التحديثات</h4>
-                <p>تم تحديث قائمة التخصصات بناءً على بيانات وزارة التربية والتعليم 2026.</p>
+        <div class="ticker-wrap">
+            <div class="ticker">
+                📢 تنبيه: بدأ التقديم المبكر للجامعات الشريكة في المدينة التعليمية • 🎓 جامعة قطر تفتح باب القبول في مارس • ✈️ تابعوا بوابة الابتعاث الحكومي للتحديثات الجديدة
             </div>
-            <div style="background:white; padding:20px; border-radius:15px; border-top:5px solid var(--primary);">
-                <h4>الاختبارات</h4>
-                <p>تأكد من مواعيد اختبارات الـ IELTS والـ SAT للقبول المبكر.</p>
+        </div>
+
+        <div class="hero">
+            <h1>منصة الإرشاد الأكاديمي والمهني</h1>
+            <p>بوابتك لاستكشاف التخصصات الجامعية وتحديد مسارك المهني بناءً على ميولك</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
+            <div style="background:white; padding:25px; border-radius:20px; border-left:5px solid var(--gold);">
+                <h3>📍 كيف تبدأ؟</h3>
+                <p>قم بإجراء <b>اختبار الميول</b> أولاً، ثم قارن نتيجتك بـ <b>التخصصات المتاحة</b> في الجامعات المحلية المذكورة في الدليل.</p>
+            </div>
+            <div style="background:white; padding:25px; border-radius:20px; border-left:5px solid var(--primary);">
+                <h3>🔍 استكشف</h3>
+                <p>تعرف على متطلبات اختبارات الـ <b>IELTS</b> والـ <b>SAT</b> لتكون جاهزاً للقبول الجامعي فور تخرجك.</p>
             </div>
         </div>
     </div>
@@ -76,34 +88,41 @@
     <div id="uniModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="hideM('uniModal')">✕</span>
-            <h2 style="color:var(--primary);">🏛️ دليل التخصصات الرسمي</h2>
+            <h2 style="color:var(--primary); text-align:center;">🏛️ دليل الجامعات والكليات في قطر</h2>
             
             <div class="uni-card">
-                <b>جامعة قطر:</b> تشمل كليات الآداب، الإدارة، التربية، الهندسة، القانون، الشريعة، والعلوم الصحية والطب.
+                <span class="uni-title">جامعة قطر</span>
+                <small>الآداب، العلوم، الإدارة والاقتصاد، القانون، التربية، الهندسة، الشريعة، العلوم الصحية، الصيدلة، والطب.</small>
             </div>
+
             <div class="uni-card">
-                <b>جامعة الدوحة (UDST):</b> تخصصات الهندسة، الحوسبة، الأعمال، والعلوم الصحية (مثل هندسة الطيران والأمن السيبراني).
+                <span class="uni-title">جامعة الدوحة للعلوم والتكنولوجيا</span>
+                <small>هندسة الطيران، الأمن السيبراني، الذكاء الاصطناعي، الهندسة البحرية، والتكنولوجيا المصرفية.</small>
             </div>
+
             <div class="uni-card">
-                <b>جامعة لوسيل:</b> الابتكار، القانون، الذكاء الاصطناعي، وتدريس اللغة الإنجليزية.
+                <span class="uni-title">جامعة لوسيل</span>
+                <small>الابتكار، ريادة الأعمال، القانون، الإرشاد النفسي، الأمن السيبراني، وتصميم الألعاب الإلكترونية.</small>
             </div>
+
             <div class="uni-card">
-                <b>المدينة التعليمية:</b> تضم كارنيجي ميلون، وايل كورنيل، وجورجتاون بتخصصات عالمية.
+                <span class="uni-title">أكاديمية قطر لعلوم الطيران</span>
+                <small>تدريب الطيارين، مراقبة جوية، هندسة صيانة الطائرات، والأرصاد الجوية.</small>
+            </div>
+
+            <div class="uni-card">
+                <span class="uni-title">الجامعات العالمية (المدينة التعليمية)</span>
+                <small>كارنيجي ميلون (حاسوب)، وايل كورنيل (طب)، تكساس A&M (هندسة)، جورجتاون (سياسة)، وفيرجينيا كومنولث (فنون).</small>
             </div>
         </div>
     </div>
 
-    <div id="examsModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="hideM('examsModal')">✕</span>
-            <h2 style="color:var(--primary);">📝 الاختبارات المعيارية المطلوبة</h2>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                <div class="stat-box"><b>IELTS / TOEFL</b><br>مطلوب للغة الإنجليزية</div>
-                <div class="stat-box"><b>SAT / ACT</b><br>مطلوب للتخصصات العلمية</div>
-                <div class="stat-box"><b>QAT</b><br>اختبار القبول لجامعة قطر</div>
-                <div class="stat-box"><b>UKAT</b><br>للتخصصات الطبية</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="quiz
+    <div id="quizModal" class="modal">
+        <div class="modal-content" id="quizPrint">
+            <span class="close-btn" onclick="hideM('quizModal')">✕</span>
+            <div id="quizBody">
+                <h3 id="qNum" style="text-align:center; color:var(--primary);"></h3>
+                <p id="qText" style="font-size:1.4rem; text-align:center; margin:40px 0;"></p>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn" style="background:#28a745;" onclick="processAns(1)">أوافق ✅</button>
+                    <button class="btn" style
