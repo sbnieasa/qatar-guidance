@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة بوصلة قطر | أ. سيف الدين بني عيسى</title>
+    <style>
+        :root { 
+            --primary: #8D1B3D; --gold: #b2945e; --bg: #f4f7f9; 
+            --qu: #8D1B3D; --udst: #004c97; --lusail: #a68936;
+            --cornell: #AA0000; --hbku: #1a3668; --astate: #CC092F; --ukm: #003399;
+        }
+
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; transition: 0.3s; }
+        body { background-color: var(--bg); margin: 0; padding-top: 40px; display: flex; }
+
+        /* شريط الأخبار */
+        .news-ticker { position: fixed; top: 0; width: 100%; height: 40px; background: var(--primary); color: white; z-index: 3000; display: flex; align-items: center; overflow: hidden; border-bottom: 2px solid var(--gold); }
+        .ticker-text { display: inline-block; white-space: nowrap; animation: ticker 60s linear infinite; padding-left: 100%; }
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(100%); } }
+
+        /* القائمة الجانبية */
+        .sidebar { width: 280px; background: white; height: 100vh; position: fixed; right: 0; top: 40px; box-shadow: -2px 0 10px rgba(0,0,0,0.1); z-index: 1000; }
+        .sidebar-header { background: var(--primary); color: white; padding: 20px; text-align: center; }
+        .sidebar-menu a { display: block; padding: 15px 20px; color: #333; text-decoration: none; border-bottom: 1px solid #eee; cursor: pointer; font-weight: 500; }
+        .sidebar-menu a:hover { background: #fdf2f5; color: var(--primary); padding-right: 30px; }
+
+        /* المحتوى الرئيسي */
+        .main-content { width: calc(100% - 280px); margin-right: 280px; padding: 40px; margin-bottom: 80px; }
+        .hero { background: linear-gradient(45deg, var(--primary), #5d1228); color: white; padding: 50px; border-radius: 20px; text-align: center; margin-bottom: 30px; }
+
+        .signature-footer { position: fixed; bottom: 0; left: 0; right: 280px; background: white; padding: 15px; text-align: center; border-top: 3px solid var(--gold); font-weight: bold; color: var(--primary); z-index: 2000; }
+
+        /* النوافذ المنبثقة */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: white; width: 100%; max-width: 950px; padding: 30px; border-radius: 20px; max-height: 90vh; overflow-y: auto; position: relative; }
+        .close-btn { position: absolute; top: 15px; left: 20px; cursor: pointer; font-size: 30px; color: #999; }
+
+        /* بطاقات الجامعات */
+        .uni-card { border: 1px solid #eee; border-radius: 15px; margin-bottom: 25px; overflow: hidden; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .uni-header { padding: 15px; color: white; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .visit-link { background: white; color: #333; padding: 4px 12px; border-radius: 50px; text-decoration: none; font-size: 0.75rem; font-weight: bold; }
+        
+        .action-btns { display: flex; border-bottom: 1px solid #eee; background: #fafafa; }
+        .action-btns button { flex: 1; padding: 14px; border: none; background: transparent; cursor: pointer; font-weight: 600; font-size: 0.95rem; }
+        .action-btns button:first-child { border-left: 1px solid #ddd; }
+        .action-btns button.req-btn { color: #b45309; }
+        
+        .content-area { padding: 20px 30px; display: none; background: #fff; border-right: 5px solid var(--gold); line-height: 1.8; }
+        .content-area h4 { margin-top: 0; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .content-area ul { padding-right: 20px; margin: 10px 0; }
+        .content-area li { margin-bottom: 5px; color: #444; }
+
+        /* اختبار الميول */
+        .option-btn { display: block; width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer; text-align: right; }
+        .option-btn:hover { background: var(--primary); color: white; }
+
+        /* البوت الذكي (الجديد) */
+        #ai-bot-toggle { position: fixed; bottom: 80px; left: 30px; width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 5000; border: 2px solid var(--gold); }
+        #ai-chat-window { display: none; position: fixed; bottom: 150px; left: 30px; width: 320px; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); flex-direction: column; overflow: hidden; z-index: 5000; border: 1px solid #eee; }
+        .chat-header { background: var(--primary); color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; }
+        #chat-messages { height: 300px; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem; }
+        .msg { padding: 8px 12px; border-radius: 10px; max-width: 80%; }
+        .bot-msg { background: #f0f0f0; align-self: flex-start; }
+        .user-msg { background: var(--primary); color: white; align-self: flex-end; }
+        .chat-input-area { display: flex; border-top: 1px solid #eee; }
+        #chat-input { flex: 1; border: none; padding: 10px; outline: none; }
+        #chat-send { background: var(--gold); color: white; border: none; padding: 10px 15px; cursor: pointer; }
+
+        @media (max-width: 992px) { .sidebar { display: none; } .main-content { width: 100%; margin-right: 0; } .signature-footer { right: 0; } }
+    </style>
+</head>
+<body>
+
+    <div class="news-ticker">
+        <div class="ticker-text">
+            🌟 منصة بوصلة قطر برؤية الأستاذ سيف الدين بني عيسى | 🎓 تم تحديث تخصصات جامعة قطر والمدينة التعليمية 2026 | 🧠 جرب اختبار الميول المهنية المطور | 📅 احجز استشارتك الأكاديمية الآن
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>بوصلة قطر</h3>
+            <small>الإرشاد الأكاديمي والمهني</small>
+        </div>
+        <div class="sidebar-menu">
+            <a onclick="showM('uniModal')">🏛️ دليل الجامعات والتخصصات</a>
+            <a onclick="showM('quizModal'); startQuiz();">🧠 اختبار الميول المهنية (15 سؤال)</a>
+            <a onclick="showM('examsModal')">📝 الاختبارات المعيارية</a>
+            <a onclick="showM('bookingModal')">📅 حجز موعد استشارة</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="hero">
+            <h1>دليل التخصصات والقبول الجامعي</h1>
+            <p>بوابتك لاكتشاف التخصصات الجامعية وتحديد مسارك المهني</p>
+        </div>
+    </div>
+
+    <div class="signature-footer">المرشد الأكاديمي / سيف الدين بني عيسى</div>
+
+    <div id="uniModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="hideM('uniModal')">✕</span>
+            <h2 style="text-align: center; color: var(--primary); margin-bottom: 30px;">دليل الكليات والتخصصات التفصيلي</h2>
+            
+            <div class="uni-card">
+                <div class="uni-header" style="background: var(--qu);">
+                    <span>🇶🇦 جامعة قطر</span>
+                    <a href="https://www.qu.edu.qa" target="_blank" class="visit-link">الموقع الرسمي</a>
+                </div>
+                <div class="action-btns">
+                    <button onclick="toggleC(this, 0)">📚 التخصصات التفصيلية</button>
+                    <button class="req-btn" onclick="toggleC(this, 1)">📋 متطلبات القبول</button>
+                </div>
+                <div class="content-area">
+                    <h4>القطاع الصحي والطب:</h4>
+                    <ul><li>الطب العام، طب الأسنان، الصيدلة، التمريض، العلوم الحيوية الطبية، تغذية الإنسان، الصحة العامة.</li></ul>
+                    <h4>كلية الهندسة:</h4>
+                    <ul><li>هندسة الحاسب، الهندسة الكيميائية، الهندسة المدنية، الهندسة الكهربائية، الهندسة الميكانيكية، العمارة.</li></ul>
+                    <h4>الكليات الإنسانية والإدارية:</h4>
+                    <ul><li>القانون، الإدارة والاقتصاد (محاسبة/مالية/تسويق)، التربية، الآداب والعلوم (إعلام/شؤون دولية/لغة إنجليزية).</li></ul>
+                </div>
+                <div class="content-area">
+                    <ul>
+                        <li><b>الآيلتس (IELTS):</b> 5.5 للكليات العلمية، الهندسية، والطبية.</li>
+                        <li><b>الرياضيات:</b> اختبار SAT (درجة 530+) أو اختبار تحديد المستوى بالجامعة.</li>
+                        <li><b>ملاحظة:</b> الكليات الأدبية (القانون، الآداب) قد لا تتطلب آيلتس للمسارات العربية.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="uni-card">
+                <div class="uni-header" style="background: var(--udst);">
+                    <span>🛠️ جامعة الدوحة للعلوم والتكنولوجيا (UDST)</span>
+                    <a href="https://www.udst.edu.qa" target="_blank" class="visit-link">الموقع الرسمي</a>
+                </div>
+                <div class="action-btns">
+                    <button onclick="toggleC(this, 0)">📚 التخصصات التفصيلية</button>
+                    <button class="req-btn" onclick="toggleC(this, 1)">📋 متطلبات القبول</button>
+                </div>
+                <div class="content-area">
+                    <h4>تكنولوجيا المعلومات:</h4>
+                    <ul><li>الأمن السيبراني، نظم المعلومات، هندسة البرمجيات، تحليل البيانات، الذكاء الاصطناعي.</li></ul>
+                    <h4>الهندسة والمهن الصناعية:</h4>
+                    <ul><li>الهندسة الميكانيكية (تصنيع)، الهندسة الكهربائية، هندسة الطاقة المتجددة، هندسة الصيانة.</li></ul>
+                    <h4>الأعمال والعلوم الصحية:</h4>
+                    <ul><li>الموارد البشرية، التسويق الرقمي، العلاج الطبيعي، الأشعة الطبية، رعاية المسعفين.</li></ul>
+                </div>
+                <div class="content-area">
+                    <ul>
+                        <li><b>IELTS:</b> 5.0 للدبلوم، 5.5 للبكالوريوس.</li>
+                        <li><b>اختبارات القبول:</b> اختبار تحديد مستوى في اللغة والرياضيات تجريه الجامعة.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="uni-card">
+                <div class="uni-header" style="background: var(--lusail);">
+                    <span>🏢 جامعة لوسيل</span>
+                    <a href="https://www.lu.edu.qa" target="_blank" class="visit-link">الموقع الرسمي</a>
+                </div>
+                <div class="action-btns">
+                    <button onclick="toggleC(this, 0)">📚 التخصصات </button>
+                    <button class="req-btn" onclick="toggleC(this, 1)">📋 متطلبات القبول</button>
+                </div>
+                <div class="content-area">
+                    <h4>كلية القانون والتربية:</h4>
+                    <ul><li>القانون (بالعربي والإنجليزي)، التربية (تعليم اللغة الإنجليزية).</li></ul>
+                    <h4>التجارة والأعمال:</h4>
+                    <ul><li>إدارة الأعمال، إدارة التسويق، المحاسبة، إدارة الموارد البشرية.</li></ul>
+                    <h4>شراكات دولية:</h4>
+                    <ul><li>برامج جامعة السوربون (فرنسا) وجامعة شيبيسبيرغ (أمريكا).</li></ul>
+                </div>
+                <div class="content-area">
+                    <ul><li><b>IELTS:</b> 5.5 للبرامج الإنجليزية، ولا يُطلب للبرامج العربية (مثل القانون).</li></ul>
+                </div>
+            </div>
+
+            <div class="uni-card">
+                <div class="uni-header" style="background: var(--cornell);">
+                    <span>🩺 وايل كورنيل للطب</span>
+                    <a href="https://qatar-weill.cornell.edu" target="_blank" class="visit-link">الموقع الرسمي</a>
+                </div>
+                <div class="action-btns">
+                    <button onclick="toggleC(this, 0)">📚 المسار الطبي</button>
+                    <button class="req-btn" onclick="toggleC(this, 1)">📋 متطلبات القبول</button>
+                </div>
+                <div class="content-area">
+                    <h4>البرنامج المتكامل:</h4>
+                    <ul><li>سنتان ما قبل الطب (Pre-medical) تغطي العلوم الأساسية.</li><li>أربع سنوات في البرنامج الطبي (MD) تنتهي بالتدريب الإكلينيكي.</li></ul>
+                </div>
+                <div class="content-area">
+                    <ul>
+                        <li><b>IELTS:</b> 7.0 (الحد الأدنى).</li>
+                        <li><b>الاختبارات:</b> SAT أو ACT + اختبارات SAT Subject في العلوم.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="uni-card">
+                <div class="uni-header" style="background: var(--hbku);">
+                    <span>🛡️ جامعة حمد بن خليفة</span>
+                    <a href="https://www.hbku.edu.qa" target="_blank" class="visit-link">الموقع الرسمي</a>
+                </div>
+                <div class="action-btns">
+                    <button onclick="toggleC(this, 0)">📚 تخصصات البكالوريوس</button>
+                    <button class="req-btn" onclick="toggleC(this, 1)">📋 متطلبات القبول</button>
+                </div>
+                <div class="content-area">
+                    <h4>كلية العلوم والهندسة:</h4>
+                    <ul><li>هندسة الحاسوب، الهندسة الكيميائية، الهندسة الكهربائية، الهندسة الميكانيكية.</li></ul>
+                </div>
+                <div class="content-area">
+                    <ul>
+                        <li><b>IELTS:</b> 6.0 كحد أدنى.</li>
+                        <li><b>الرياضيات:</b> درجات متميزة في مسار العلمي.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="uni-card">
+                <div class="uni-header" style="background: var(--astate);">
+                    <span> جامعة ولاية أركنساس</span>
+                    <a href="#" target="_blank" class="visit-link">الموقع الرسمي</a>
+                </div>
+                <div class="action-btns">
+                    <button onclick="toggleC(this, 0)">📚 التخصصات</button>
+                    <button class="req-btn" onclick="toggleC(this, 1)">📋 متطلبات القبول</button>
+                </div>
+                <div class="content-area">
+                    <h4>برامج التكنولوجيا والأعمال:</h4>
+                    <ul><li>الذكاء الاصطناعي، الأمن السيبراني، إدارة الأعمال، علوم الحاسوب، تصميم الألعاب الرقمية.</li></ul>
+                </div>
+                <div class="content-area">
+                    <ul><li><b>IELTS:</b> 5.5.</li><li>شهادة الثانوية العامة بمعدل جيد.</li></ul>
+                </div>
+            </div>
+
+            <div class="uni-card">
+                <div class="uni-header" style="background: var(--ukm);">
+                    <span> الجامعة الماليزية (UKM)</span>
+                    <a href="#" target="_blank" class="visit-link">الموقع الرسمي</a>
+                </div>
+                <div class="action-btns">
+                    <button onclick="toggleC(this, 0)">📚 التخصصات</button>
+                    <button class="req-btn" onclick="toggleC(this, 1)">📋 متطلبات القبول</button>
+                </div>
+                <div class="content-area">
+                    <h4>العلوم والتكنولوجيا:</h4>
+                    <ul><li>العلوم الاكتوارية، هندسة البرمجيات، المحاسبة، تكنولوجيا المعلومات.</li></ul>
+                </div>
+                <div class="content-area">
+                    <ul><li><b>IELTS:</b> 5.5.</li></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="examsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="hideM('examsModal')">✕</span>
+            <h2 style="color: var(--primary); text-align: center;">دليل الاختبارات والروابط الرسمية</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                <div style="background: #f9f9f9; padding: 20px; border-radius: 15px; border-top: 4px solid var(--qu);">
+                    <h3>🇬🇧 اختبار IELTS</h3>
+                    <p>الموقع الرسمي للتسجيل:</p>
+                    <a href="https://www.ielts.org" target="_blank">IELTS.org</a>
+                    <hr>
+                    <p>اختبارات تجريبية مجانية:</p>
+                    <a href="https://takeielts.britishcouncil.org/take-ielts/prepare/free-ielts-practice-tests" target="_blank">British Council Practice</a>
+                </div>
+                <div style="background: #f9f9f9; padding: 20px; border-radius: 15px; border-top: 4px solid var(--udst);">
+                    <h3>🇺🇸 اختبار SAT</h3>
+                    <p>الموقع الرسمي للتسجيل:</p>
+                    <a href="https://satsuite.collegeboard.org/sat" target="_blank">College Board</a>
+                    <hr>
+                    <p>أفضل موقع للتدريب:</p>
+                    <a href="https://www.khanacademy.org/sat" target="_blank">Khan Academy SAT</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="quizModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="hideM('quizModal')">✕</span>
+            <div id="quiz-container">
+                <h2 style="text-align: center;">🧠 اختبار الميول المهنية المطور</h2>
+                <div id="question-area"></div>
+                <div id="quiz-result" style="display:none; text-align: center; background: #e8f5e9; padding: 30px; border-radius: 15px;">
+                    <h3 id="result-title"></h3>
+                    <p id="result-text"></p>
+                    <button onclick="sendToCounselor()" style="background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; margin-top: 20px;">إرسال التقرير للمرشد</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="bookingModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-btn" onclick="hideM('bookingModal')">✕</span>
+            <h2 style="text-align: center; color: var(--primary);">حجز استشارة أكاديمية</h2>
+            <form onsubmit="event.preventDefault(); alert('تم استلام طلبك يا ' + document.getElementById('sName').value); hideM('bookingModal');">
+                <input type="text" id="sName" placeholder="الاسم الكامل للطالب" required style="width:100%; padding:12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px;">
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" placeholder="الصف (مثلاً: 12)" required style="flex:2; padding:12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px;">
+                    <input type="text" placeholder="الشعبة" required style="flex:1; padding:12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px;">
+                </div>
+                <input type="tel" placeholder="رقم الهاتف للتواصل" required style="width:100%; padding:12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px;">
+                <button type="submit" style="width:100%; background: var(--primary); color: white; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">تأكيد الحجز</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="ai-bot-toggle" onclick="toggleChat()">🤖</div>
+    <div id="ai-chat-window">
+        <div class="chat-header"><span>مساعد بوصلة الذكي</span><span style="cursor:pointer" onclick="toggleChat()">✕</span></div>
+        <div id="chat-messages"><div class="msg bot-msg">مرحباً! أنا مساعدك الذكي. كيف أساعدك في اختيار تخصصك اليوم؟</div></div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="اسألني أي شيء...">
+            <button id="chat-send" onclick="sendMessage()">إرسال</button>
+        </div>
+    </div>
+
+    <script>
+        // دالات العرض الأساسية
+        function showM(id) { document.getElementById(id).style.display = 'flex'; }
+        function hideM(id) { document.getElementById(id).style.display = 'none'; }
+        function toggleC(btn, index) {
+            const card = btn.closest('.uni-card');
+            const contents = card.querySelectorAll('.content-area');
+            const isVisible = contents[index].style.display === 'block';
+            contents.forEach(c => c.style.display = 'none');
+            contents[index].style.display = isVisible ? 'none' : 'block';
+        }
+
+        // منطق البوت
+        function toggleChat() { 
+            const w = document.getElementById('ai-chat-window'); 
+            w.style.display = (w.style.display==='flex')?'none':'flex'; 
+        }
+        function sendMessage() {
+            const inp = document.getElementById('chat-input');
+            const msg = inp.value.trim(); if(!msg) return;
+            addMsg(msg, 'user-msg'); inp.value="";
+            setTimeout(() => {
+                let r = "تجد كافة تفاصيل " + msg + " في دليل الجامعات أو يمكنك حجز استشارة مع أ. سيف الدين.";
+                if(msg.includes("قطر")) r = "جامعة قطر تطلب آيلتس 5.5 للهندسة والطب، وتجد تخصصاتها في قسم الجامعات.";
+                addMsg(r, 'bot-msg');
+            }, 800);
+        }
+        function addMsg(t, c) {
+            const b = document.getElementById('chat-messages');
+            const d = document.createElement('div'); d.className = 'msg '+c; d.innerText = t;
+            b.appendChild(d); b.scrollTop = b.scrollHeight;
+        }
+
+        // منطق اختبار الميول (15 سؤال كاملة)
+        const questions = [
+            {q: "هل تحب فك وتركيب الأجهزة؟", type: "R"},
+            {q: "هل تحب القراءة عن العلوم والأبحاث؟", type: "I"},
+            {q: "هل تستمتع بالرسم أو التصميم؟", type: "A"},
+            {q: "هل تحب التطوع لمساعدة الآخرين؟", type: "S"},
+            {q: "هل تود أن تصبح مديراً لمشروع؟", type: "E"},
+            {q: "هل تحب ترتيب الملفات والجداول؟", type: "C"},
+            {q: "هل تفضل العمل خارج المكاتب؟", type: "R"},
+            {q: "هل تجذبك الألغاز والتحليلات؟", type: "I"},
+            {q: "هل تحب الكتابة والتعبير الفني؟", type: "A"},
+            {q: "هل تحب تقديم النصائح للأصدقاء? ", type: "S"},
+            {q: "هل تبرع في إقناع الناس برأيك؟", type: "E"},
+            {q: "هل تهتم بالتفاصيل المالية والأرقام؟", type: "C"},
+            {q: "هل تستمتع بالعمل اليدوي؟", type: "R"},
+            {q: "هل تحب الاستكشاف والتجربة؟", type: "I"},
+            {q: "هل تميل للإبداع والابتكار الدائم؟", type: "A"}
+        ];
+
+        let currentQ = 0, scores = {R:0, I:0, A:0, S:0, E:0, C:0};
+
+        function startQuiz() {
+            currentQ = 0; scores = {R:0, I:0, A:0, S:0, E:0, C:0};
+            document.getElementById('question-area').style.display = 'block';
+            document.getElementById('quiz-result').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const area = document.getElementById('question-area');
+            if (currentQ < questions.length) {
+                area.innerHTML = `<p style="font-weight:bold;">سؤال ${currentQ+1}: ${questions[currentQ].q}</p>
+                <button class="option-btn" onclick="nextQ(2)">نعم</button>
+                <button class="option-btn" onclick="nextQ(1)">أحياناً</button>
+                <button class="option-btn" onclick="nextQ(0)">لا</button>`;
+            } else { showResult(); }
+        }
+
+        function nextQ(v) { scores[questions[currentQ].type] += v; currentQ++; showQuestion(); }
+
+        function showResult() {
+            document.getElementById('question-area').style.display = 'none';
+            const res = document.getElementById('quiz-result'); res.style.display = 'block';
+            let top = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+            const data = {
+                R: "واقعي: تناسبك الهندسة والعلوم التطبيقية.",
+                I: "استقصائي: تناسبك الطب والبحث العلمي.",
+                A: "فني: تناسبك العمارة والإعلام والفنون.",
+                S: "اجتماعي: تناسبك التربية وعلم النفس.",
+                E: "مبادر: تناسبك إدارة الأعمال والقانون.",
+                C: "تقليدي: تناسبك المحاسبة ونظم المعلومات."
+            };
+            document.getElementById('result-title').innerText = "نمطك هو: " + top;
+            document.getElementById('result-text').innerText = data[top];
+        }
+
+        function sendToCounselor() { alert("تم الإرسال للأستاذ سيف الدين."); hideM('quizModal'); }
+    </script>
+</body>
+</html>
