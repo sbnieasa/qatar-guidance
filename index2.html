@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوصلة قطر التعليمية | أ. سيف الدين بني عيسى</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #8D1B3D; --gold: #b2945e; --bg: #f4f7f9; --emerald: #0b5a4b; --white: #ffffff; --link: #005a8e; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; transition: 0.3s; }
+        body { background-color: var(--bg); margin: 0; padding-top: 40px; display: flex; color: #333; min-height: 100vh; overflow-x: hidden; }
+        body.en-mode { direction: ltr; }
+
+        .news-ticker { position: fixed; top: 0; width: 100%; height: 40px; background: var(--primary); color: white; z-index: 3000; display: flex; align-items: center; overflow: hidden; border-bottom: 2px solid var(--gold); }
+        .ticker-text { display: inline-block; white-space: nowrap; animation: ticker 40s linear infinite; padding-left: 100%; font-size: 0.9rem; }
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(100%); } }
+        body.en-mode .ticker-text { animation: ticker-en 40s linear infinite; padding-right: 100%; padding-left: 0; }
+        @keyframes ticker-en { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        .sidebar { width: 280px; background: white; height: 100vh; position: fixed; right: 0; top: 40px; box-shadow: -2px 0 15px rgba(0,0,0,0.1); z-index: 1000; display: flex; flex-direction: column; }
+        body.en-mode .sidebar { right: auto; left: 0; }
+        .sidebar-header { background: var(--primary); color: white; padding: 20px; text-align: center; border-bottom: 4px solid var(--gold); }
+        .sidebar-menu a { display: flex; align-items: center; gap: 10px; padding: 15px 20px; color: #444; text-decoration: none; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
+        .sidebar-menu a:hover { background: #fff8f9; color: var(--primary); padding-right: 30px; }
+
+        .main-content { width: calc(100% - 280px); margin-right: 280px; padding: 20px; margin-bottom: 80px; }
+        body.en-mode .main-content { margin-right: 0; margin-left: 280px; }
+        .hero-section { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 30px; text-align: center; border-top: 5px solid var(--primary); position: relative; }
+        
+        .lang-btn { position: absolute; top: 15px; left: 15px; background: var(--gold); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        body.en-mode .lang-btn { left: auto; right: 15px; }
+
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(5px); }
+        .modal-content { background: white; width: 100%; max-width: 900px; padding: 25px; border-radius: 25px; max-height: 85vh; overflow-y: auto; position: relative; }
+        .close-btn { position: absolute; top: 15px; left: 15px; cursor: pointer; font-size: 24px; color: #bbb; }
+        body.en-mode .close-btn { left: auto; right: 15px; }
+
+        .card-box { border: 1px solid #eee; border-radius: 12px; margin-bottom: 12px; overflow: hidden; background: #fff; }
+        .card-header { padding: 12px 18px; color: white; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: var(--primary); }
+        .card-body { padding: 15px; display: none; background: #fdfdfd; line-height: 1.6; }
+
+        .btn-gov-link { display: block; width: 100%; padding: 18px; margin-top: 15px; background: #e6f4f1; border: 2px solid var(--emerald); color: var(--emerald); text-align: center; text-decoration: none; font-weight: 800; border-radius: 12px; font-size: 1.1rem; }
+        .btn-gov-link:hover { background: var(--emerald); color: white; }
+        
+        .btn-exam { display: inline-block; padding: 10px 20px; margin: 5px; border-radius: 6px; text-decoration: none; color: white; font-size: 0.9rem; font-weight: bold; }
+
+        .quiz-container { background: #fcfcfc; border: 2px dashed #ddd; border-radius: 20px; padding: 30px; text-align: center; }
+        .quiz-option { display: inline-block; width: 110px; padding: 15px; margin: 10px; border: 2px solid var(--primary); border-radius: 12px; cursor: pointer; font-weight: bold; }
+        .quiz-progress { width: 100%; height: 12px; background: #eee; border-radius: 6px; margin-bottom: 25px; overflow: hidden; }
+        .quiz-bar { height: 100%; background: var(--gold); width: 0%; transition: 0.4s; }
+
+        .result-detail-card { background: #fefefe; border: 1px solid #ddd; border-radius: 15px; padding: 20px; margin-top: 20px; text-align: right; }
+        body.en-mode .result-detail-card { text-align: left; }
+        .res-type-title { color: var(--primary); font-size: 1.3rem; border-bottom: 2px solid var(--gold); display: inline-block; margin-bottom: 10px; }
+
+        .booking-card { background: #fff; border-radius: 15px; padding: 25px; border-left: 5px solid var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .input-group { margin-bottom: 20px; text-align: right; }
+        body.en-mode .input-group { text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--primary); }
+        .input-group input, .input-group select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; background: #fafafa; }
+
+        .bot-icon { position: fixed; bottom: 80px; left: 20px; background: var(--primary); width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 28px; cursor: pointer; z-index: 5000; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .chat-box { position: fixed; bottom: 155px; left: 20px; width: 320px; background: white; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 5000; display: none; flex-direction: column; border: 1px solid #ddd; overflow: hidden; }
+        .chat-head { background: var(--primary); color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+
+        .signature-footer { position: fixed; bottom: 0; left: 0; right: 280px; background: white; padding: 15px; text-align: center; border-top: 3px solid var(--gold); font-weight: bold; color: var(--primary); z-index: 2000; }
+        body.en-mode .signature-footer { right: 0; left: 280px; }
+
+        @media (max-width: 992px) { 
+            .sidebar { display: none; } 
+            .main-content { width: 100%; margin-right: 0; margin-left: 0; padding-top: 60px; } 
+            .signature-footer { right: 0; left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="news-ticker">
+        <div id="ticker-text" class="ticker-text" data-ar="🌟 منصة بوصلة قطر 2026 | تحت إشراف الأستاذ سيف الدين بني عيسى | دليل الجامعات والابتعاث المحدث" data-en="🌟 Qatar Compass Platform 2026 | Supervised by Mr. Saifuddin Bani Issa | Updated Universities & Scholarships Guide">🌟 منصة بوصلة قطر 2026 | تحت إشراف الأستاذ سيف الدين بني عيسى | دليل الجامعات والابتعاث المحدث</div>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-header"><h3>بوصلة قطر</h3><small>الإرشاد الأكاديمي والمهني</small></div>
+        <div class="sidebar-menu">
+            <a onclick="showM('uniModal')"><i class="fas fa-university"></i> <span data-ar="دليل الجامعات" data-en="Universities Guide">دليل الجامعات</span></a>
+            <a onclick="showM('scholarModal')"><i class="fas fa-plane-departure"></i> <span data-ar="دليل الابتعاث" data-en="Scholarships">دليل الابتعاث</span></a>
+            <a onclick="showM('examsModal')"><i class="fas fa-file-signature"></i> <span data-ar="الاختبارات المعيارية" data-en="Standard Tests">الاختبارات المعيارية</span></a>
+            <a onclick="showM('quizModal'); startQuiz();"><i class="fas fa-brain"></i> <span data-ar="اختبار الميول (16 سؤال)" data-en="Career Quiz (16 Qs)">اختبار الميول (16 سؤال)</span></a>
+            <a onclick="showM('bookingModal')"><i class="fas fa-calendar-check"></i> <span data-ar="حجز جلسة إرشادية" data-en="Book a Session">حجز جلسة إرشادية</span></a>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="hero-section">
+            <button class="lang-btn" onclick="toggleLang()">English</button>
+            <h1 id="h-title" data-ar="دليل التخصصات والقبول الجامعي لمستقبل مهني متميز" data-en="Your Academic Guide to Excellence">مرشدك الأكاديمي نحو التميز</h1>
+            <p id="h-desc" data-ar="بوابتك لاكتشاف التخصصات الجامعية وتحديد مسارك المهني" data-en="Your portal to discover university majors and define your career path">بوابتك لاكتشاف التخصصات الجامعية وتحديد مسارك المهني </p>
+        </div>
+    </main>
+
+    <div id="uniModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="hideM('uniModal')">✕</span>
+            <h2 style="text-align: center; color: var(--primary);" data-ar="🏛️ مؤسسات التعليم العالي في قطر" data-en="🏛️ Higher Education Institutions in Qatar">🏛️ مؤسسات التعليم العالي في قطر</h2>
+            <div id="uni-list"></div>
+        </div>
+    </div>
+
+    <div id="scholarModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="hideM('scholarModal')">✕</span>
+            <h2 style="text-align: center; color: var(--gold);" data-ar="✈️ خيارات الابتعاث الحكومي 2026" data-en="✈️ Government Scholarship Options 2026">✈️ خيارات الابتعاث الحكومي 2026</h2>
+            <div class="card-box">
+                <div class="card-header"><span data-ar="🌟 الابتعاث الأميري (Amyri Scholarship)" data-en="🌟 Amiri Scholarship">🌟 الابتعاث الأميري (Amyri Scholarship)</span></div>
+                <div class="card-body" style="display:block" data-ar="مخصص للطلاب المقبولين في أفضل 24 جامعة عالمياً حسب تصنيف وزارة التربية. يتميز براتب شهري أعلى وإعفاءات خاصة." data-en="For students accepted into the top 24 world universities. Features higher monthly stipends and special exemptions.">مخصص للطلاب المقبولين في أفضل 24 جامعة عالمياً حسب تصنيف وزارة التربية. يتميز براتب شهري أعلى وإعفاءات خاصة.</div>
+            </div>
+            <div class="card-box">
+                <div class="card-header" style="background:var(--emerald)"><span data-ar="🌍 الابتعاث الخارجي والداخلي" data-en="🌍 External & Internal Scholarships">🌍 الابتعاث الخارجي والداخلي</span></div>
+                <div class="card-body" style="display:block" data-ar="يغطي التخصصات التي تحتاجها الدولة في سوق العمل (طب، هندسة، تمريض، حاسب، لغات) في الجامعات المحلية أو الخارجية المعتمدة." data-en="Covers majors needed by the labor market (Medicine, Engineering, Nursing, IT, Languages) in local or approved international universities.">يغطي التخصصات التي تحتاجها الدولة في سوق العمل (طب، هندسة، تمريض، حاسب، لغات) في الجامعات المحلية أو الخارجية المعتمدة.</div>
+            </div>
+            <a href="https://scholarship.edu.gov.qa/" target="_blank" class="btn-gov-link" data-ar="🔗 التقديم عبر بوابة ناصح للابتعاث الحكومي" data-en="🔗 Apply via Naseh Portal for Gov Scholarships">🔗 التقديم عبر بوابة ناصح للابتعاث الحكومي</a>
+        </div>
+    </div>
+
+    <div id="examsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="hideM('examsModal')">✕</span>
+            <h2 style="text-align: center; color: var(--primary);" data-ar="📝 دليل الاختبارات الدولية المطلوبة" data-en="📝 International Tests Guide">📝 دليل الاختبارات الدولية المطلوبة</h2>
+            <div id="exams-container"></div>
+        </div>
+    </div>
+
+    <div id="quizModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="hideM('quizModal')">✕</span>
+            <h2 style="text-align:center;" data-ar="🧠 اختبار تحديد الميول الأكاديمية" data-en="🧠 Academic Interests Quiz">🧠 اختبار تحديد الميول الأكاديمية</h2>
+            <div id="quiz-box">
+                <div class="quiz-container">
+                    <div class="quiz-progress"><div id="q-bar" class="quiz-bar"></div></div>
+                    <div id="q-area">
+                        <h3 id="q-text" data-ar="هل أنت مستعد لبدء الاختبار؟" data-en="Are you ready to start?">هل أنت مستعد لبدء الاختبار؟</h3>
+                        <div id="q-options"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="q-res" style="display:none; text-align: center;">
+                <canvas id="myChart" style="max-height:300px; margin:auto;"></canvas>
+                <div id="analysis-text" class="result-detail-card"></div>
+                <div style="margin-top:20px;">
+                    <button onclick="downloadPDF()" class="btn-gov-link" style="display:inline-block; width:45%; background:var(--primary); color:white;" data-ar="تحميل النتيجة PDF" data-en="Download PDF Result">تحميل النتيجة PDF</button>
+                    <button onclick="alert('Sent to advisor.')" class="btn-gov-link" style="display:inline-block; width:45%;" data-ar="إرسال للمرشد" data-en="Send to Advisor">إرسال للمرشد</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="bookingModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-btn" onclick="hideM('bookingModal')">✕</span>
+            <h2 style="text-align:center; color:var(--primary);" data-ar="📅 طلب استشارة مع أ. سيف الدين" data-en="📅 Request Consultation with Mr. Saif">📅 طلب استشارة مع أ. سيف الدين</h2>
+            <div class="booking-card">
+                <div class="input-group">
+                    <label data-ar="اسم الطالب الكامل:" data-en="Full Student Name:">اسم الطالب الكامل:</label>
+                    <input type="text" id="std_name" placeholder="Name as per ID">
+                </div>
+                <div class="input-group">
+                    <label data-ar="المرحلة الدراسية:" data-en="Grade Level:">المرحلة الدراسية:</label>
+                    <select id="std_level">
+                        <option data-ar="ثاني عشر (تخرج)" data-en="Grade 12 (Graduation)">ثاني عشر (تخرج)</option>
+                        <option data-ar="حادي عشر" data-en="Grade 11">حادي عشر</option>
+                        <option data-ar="عاشر" data-en="Grade 10">عاشر</option>
+                        <option data-ar="خريج سابق" data-en="Alumni">خريج سابق</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label data-ar="موضوع الاستشارة:" data-en="Consultation Topic:">موضوع الاستشارة:</label>
+                    <select id="std_topic">
+                        <option data-ar="الابتعاث الحكومي (ناصح)" data-en="Gov Scholarship (Naseh)">الابتعاث الحكومي (ناصح)</option>
+                        <option data-ar="اختيار التخصص الجامعي" data-en="Major Selection">اختيار التخصص الجامعي</option>
+                        <option data-ar="التقديم للجامعات المحلية" data-en="Local University Application">التقديم للجامعات المحلية</option>
+                        <option data-ar="الاختبارات المعيارية" data-en="Standardized Tests">الاختبارات المعيارية</option>
+                        <option data-ar="المسارات الأكاديمية" data-en="Academic Tracks">المسارات الأكاديمية</option>
+                    </select>
+                </div>
+                <button class="btn-gov-link" style="background:var(--primary); color:white; border:none; cursor:pointer;" onclick="alert('Done!'); hideM('bookingModal');" data-ar="إرسال طلب الحجز" data-en="Submit Booking Request">إرسال طلب الحجز</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bot-icon" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
+    <div class="chat-box" id="chatWin">
+        <div class="chat-head">
+            <span data-ar="مساعد بوصلة الذكي" data-en="Compass AI Assistant">مساعد بوصلة الذكي</span>
+            <span onclick="toggleChat()" style="cursor:pointer">✕</span>
+        </div>
+        <div id="chatMsgs" style="height:220px; overflow-y:auto; padding:15px; font-size:0.85rem; background:#f9f9f9;">
+            <div data-ar="مرحباً بك! كيف يمكنني مساعدتك اليوم؟" data-en="Welcome! How can I help you today?">مرحباً بك! كيف يمكنني مساعدتك اليوم؟</div>
+        </div>
+        <div style="display:flex; border-top:1px solid #eee; padding:10px;">
+            <input type="text" id="chatIn" data-ar-placeholder="اكتب رسالتك هنا..." data-en-placeholder="Type your message..." placeholder="..." style="flex:1; border:1px solid #ddd; padding:8px; border-radius:5px;">
+            <button onclick="sendMsg()" style="border:none; background:none; color:var(--primary); margin-right:10px; cursor:pointer;"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <footer class="signature-footer" data-ar="المرشد الأكاديمي / سيف الدين بني عيسى © 2026" data-en="Academic Advisor / Saifuddin Bani Issa © 2026">المرشد الأكاديمي / سيف الدين بني عيسى © 2026</footer>
+
+    <script>
+        let isEn = false;
+
+        const unis = [
+            { n: { ar: "جامعة قطر (QU)", en: "Qatar University (QU)" }, t: { ar: "الطب،طب الاسنان،التمريض، الهندسة،العلوم الصحية، الإدارة والاقتصاد، القانون، التربية، الاداب والعلوم، الشريعة، الرياضة.", en: "Medicine, Dentistry, Nursing, Engineering, Health Sciences, Business, Law, Education, Arts, Sharia, Sports." }, r: "https://www.qu.edu.qa/" },
+            { n: { ar: "جامعة الدوحة للعلوم والتكنولوجيا (UDST)", en: "Doha University for Science and Tech (UDST)" }, t: { ar: "تكنولوجيا الهندسة، الحوسبة، تمريض، إدارة أعمال.", en: "Engineering Tech, Computing, Nursing, Business Admin." }, r: "https://www.udst.edu.qa/" },
+            { n: { ar: "جامعة لوسيل", en: "Lusail University" }, t: { ar: "القانون، التربية والآداب، العلوم الإدارية.", en: "Law, Education & Arts, Administrative Sciences." }, r: "https://www.lu.edu.qa/" },
+            { n: { ar: "جامعة حمد بن خليفة (HBKU)", en: "Hamad Bin Khalifa University (HBKU)" }, t: { ar: "الدراسات الإسلامية، العلوم والهندسة، السياسة العامة.", en: "Islamic Studies, Science & Engineering, Public Policy." }, r: "https://www.hbku.edu.qa/" },
+            { n: { ar: "وايل كورنيل للطب - قطر", en: "Weill Cornell Medicine - Qatar" }, t: { ar: "الطب (برنامج 6 سنوات مدمج).", en: "Medicine (6-year integrated program)." }, r: "https://qatar-weill.cornell.edu/" },
+            { n: { ar: "جامعة كارنيجي ميلون", en: "Carnegie Mellon University" }, t: { ar: "علوم الحاسوب، إدارة الأعمال، أنظمة المعلومات.", en: "Computer Science, Business Admin, Info Systems." }, r: "https://www.qatar.cmu.edu/" },
+            { n: { ar: "جامعة جورجتاون", en: "Georgetown University" }, t: { ar: "الشؤون الدولية، الثقافة والسياسة.", en: "International Affairs, Culture & Politics." }, r: "https://www.qatar.georgetown.edu/" },
+            { n: { ar: "جامعة نورثويسترن", en: "Northwestern University" }, t: { ar: "الصحافة، الاتصال، الإعلام.", en: "Journalism, Communication, Media." }, r: "https://www.qatar.northwestern.edu/" },
+            { n: { ar: "جامعة فيرجينيا كومونولث (VCUarts)", en: "Virginia Commonwealth University (VCU)" }, t: { ar: "التصميم الغرافيكي، التصميم الداخلي، الفنون الجميلة.", en: "Graphic Design, Interior Design, Fine Arts." }, r: "https://qatar.vcu.edu/" }
+        ];
+
+        // الاختبارات المعيارية الأربعة مع المواقع
+        const exams = [
+            { 
+                id: "ex-i", 
+                n: "IELTS (International English Language Testing System)", 
+                d: { ar: "الاختبار الأكثر طلباً في قطر وبريطانيا. يقيس مهارات الاستماع، القراءة، الكتابة، والمحادثة.", en: "The most requested test in Qatar and UK. Measures Listening, Reading, Writing, and Speaking skills." }, 
+                link: "https://www.ielts.org/", 
+                train: "https://www.ieltsbuddy.com/", 
+                color: "#8D1B3D" 
+            },
+            { 
+                id: "ex-t", 
+                n: "TOEFL iBT (Test of English as a Foreign Language)", 
+                d: { ar: "اختبار اللغة الإنجليزية الأمريكي (عبر الإنترنت). مطلوب بشدة في جامعات المدينة التعليمية وتخصصات الطب.", en: "American English test (online). Highly required in Education City universities and Medicine majors." }, 
+                link: "https://www.ets.org/toefl", 
+                train: "https://www.test-guide.com/free-toefl-practice-tests.html", 
+                color: "#2980b9" 
+            },
+            { 
+                id: "ex-s", 
+                n: "SAT (Scholastic Aptitude Test)", 
+                d: { ar: "اختبار قدرات يقيس مهارات الرياضيات والقراءة والكتابة باللغة الإنجليزية. متطلب أساسي للقبول في المدينة التعليمية.", en: "Aptitude test measuring Math, Reading, and Writing in English. Essential requirement for Education City admission." }, 
+                link: "https://www.collegeboard.org/", 
+                train: "https://www.khanacademy.org/sat", 
+                color: "#e67e22" 
+            },
+            { 
+                id: "ex-a", 
+                n: "ACT (American College Testing)", 
+                d: { ar: "بديل لاختبار السات، يحتوي على قسم إضافي للعلوم. تفضله بعض الكليات العلمية والهندسية في قطر.", en: "An alternative to SAT, includes an extra Science section. Preferred by some scientific and engineering colleges in Qatar." }, 
+                link: "https://global.act.org/", 
+                train: "https://www.act.org/content/act/en/products-and-services/the-act/test-preparation/free-act-test-prep.html", 
+                color: "#16a085" 
+            }
+        ];
+
+        const questions = [
+            {q: {ar:"هل تستمتع بفك وتصليح الأجهزة الإلكترونية؟", en:"Do you enjoy fixing electronic devices?"}, t:"R"},
+            {q: {ar:"هل تحب حل المسائل الرياضية المعقدة؟", en:"Do you like solving complex math problems?"}, t:"I"},
+            {q: {ar:"هل تميل لتصميم الشعارات أو الصور الفنية؟", en:"Do you enjoy designing logos or arts?"}, t:"A"},
+            {q: {ar:"هل تشعر بالسعادة عند مساعدة الآخرين؟", en:"Do you feel happy when helping others?"}, t:"S"},
+            {q: {ar:"هل تحب قيادة فريق في مشروع مدرسي؟", en:"Do you like leading a team in school?"}, t:"E"},
+            {q: {ar:"هل تحب ترتيب ملفاتك وبياناتك بدقة؟", en:"Do you like organizing files precisely?"}, t:"C"},
+            {q: {ar:"هل تفضل العمل اليدوي في الحديقة أو الورشة؟", en:"Do you prefer hands-on work?"}, t:"R"},
+            {q: {ar:"هل تستمتع بقراءة المقالات العلمية؟", en:"Do you enjoy reading scientific articles?"}, t:"I"},
+            {q: {ar:"هل تحب كتابة القصص أو الأشعار؟", en:"Do you like writing stories or poems?"}, t:"A"},
+            {q: {ar:"هل تحب التطوع في الهلال الأحمر أو الجمعيات؟", en:"Do you like volunteering?"}, t:"S"},
+            {q: {ar:"هل تطمح لافتتاح مشروعك التجاري الخاص؟", en:"Do you aspire to start your own business?"}, t:"E"},
+            {q: {ar:"هل تلتزم دائماً بالقوانين والأنظمة المكتوبة؟", en:"Do you always stick to rules?"}, t:"C"},
+            {q: {ar:"هل تحب الأنشطة البدنية والرياضية؟", en:"Do you like physical activities?"}, t:"R"},
+            {q: {ar:"هل تقضي وقتاً في البحث عن أصل الأشياء؟", en:"Do you research origins of things?"}, t:"I"},
+            {q: {ar:"هل تحب التصميم الداخلي وتنسيق الألوان؟", en:"Do you like interior design?"}, t:"A"},
+            {q: {ar:"هل تستمتع بشرح الدروس لزملائك؟", en:"Do you enjoy explaining lessons?"}, t:"S"}
+        ];
+
+        const analysisData = {
+            R: { 
+                title: {ar: "النمط الواقعي (Realistic)", en: "Realistic Style"},
+                desc: {ar: "أنت شخص عملي، تحب العمل بيديك وتفضل التعامل مع الأشياء والآلات بدلاً من الأفكار المجردة.", en: "You are a practical person who loves hands-on work and prefers dealing with machines over abstract ideas."},
+                majors: {ar: "الهندسة الميكانيكية، الطيران، تكنولوجيا المعلومات، الزراعة، الطب المهني.", en: "Mechanical Engineering, Aviation, IT, Agriculture, Occupational Medicine."}
+            },
+            I: {
+                title: {ar: "النمط الاستقصائي (Investigative)", en: "Investigative Style"},
+                desc: {ar: "أنت مفكر تحليل، تحب البحث والاكتشاف وحل الألغاز العلمية والرياضية.", en: "You are an analytical thinker who loves research, discovery, and solving scientific puzzles."},
+                majors: {ar: "الطب، العلوم الحيوية، الفيزياء، الرياضيات، هندسة البرمجيات، الأمن السيبراني.", en: "Medicine, Biosciences, Physics, Mathematics, Software Engineering, Cybersecurity."}
+            },
+            A: {
+                title: {ar: "النمط الفني (Artistic)", en: "Artistic Style"},
+                desc: {ar: "أنت مبدع وغير تقليدي، تفضل التعبير عن نفسك من خلال الفن، الكتابة، أو التصميم.", en: "You are creative and unconventional, preferring self-expression through art, writing, or design."},
+                majors: {ar: "العمارة، التصميم الغرافيكي، الإعلام، الأدب، الفنون الجميلة، التسويق الإبداعي.", en: "Architecture, Graphic Design, Media, Literature, Fine Arts, Creative Marketing."}
+            },
+            S: {
+                title: {ar: "النمط الاجتماعي (Social)", en: "Social Style"},
+                desc: {ar: "أنت شخص محب للمساعدة، بارع في التواصل، وتجد شغفك في تعليم وتطوير الآخرين.", en: "You are helpful, communicative, and find passion in teaching and developing others."},
+                majors: {ar: "التربية والتعليم، التمريض، علم النفس، الخدمة الاجتماعية، الإرشاد الأكاديمي.", en: "Education, Nursing, Psychology, Social Work, Academic Counseling."}
+            },
+            E: {
+                title: {ar: "النمط المبادر (Enterprising)", en: "Enterprising Style"},
+                desc: {ar: "أنت قائد بالفطرة، تحب الإقناع والتأثير في الآخرين، وتمتلك روح المغامرة في المال والأعمال.", en: "You are a natural leader who loves persuasion and has an adventurous spirit in business."},
+                majors: {ar: "إدارة الأعمال، القانون، العلوم السياسية، التسويق، العلاقات الدولية.", en: "Business Admin, Law, Political Science, Marketing, International Relations."}
+            },
+            C: {
+                title: {ar: "النمط التقليدي (Conventional)", en: "Conventional Style"},
+                desc: {ar: "أنت شخص منظم ودقيق، تحب العمل مع البيانات والأرقام وتفضل البيئات ذات القوانين الواضحة.", en: "You are organized and precise, loving data and numbers in structured environments."},
+                majors: {ar: "المحاسبة، المالية، إدارة نظم المعلومات، الاقتصاد، علوم البيانات.", en: "Accounting, Finance, MIS, Economics, Data Science."}
+            }
+        };
+
+        function renderLists() {
+            const uniList = document.getElementById('uni-list');
+            uniList.innerHTML = '';
+            unis.forEach((u, i) => {
+                uniList.innerHTML += `<div class="card-box"><div class="card-header" onclick="toggleC('u-${i}')"><span>${isEn?u.n.en:u.n.ar}</span><i class="fas fa-chevron-down"></i></div><div id="u-${i}" class="card-body"><p><b>${isEn?'Colleges:':'الكليات:'}</b> ${isEn?u.t.en:u.t.ar}</p><a href="${u.r}" target="_blank">${isEn?'Visit Site':'زيارة الموقع'}</a></div></div>`;
+            });
+            const examCont = document.getElementById('exams-container');
+            examCont.innerHTML = '';
+            exams.forEach(ex => {
+                examCont.innerHTML += `
+                <div class="card-box">
+                    <div class="card-header" style="background:${ex.color}" onclick="toggleC('${ex.id}')">
+                        <span>${ex.n}</span> <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div id="${ex.id}" class="card-body">
+                        <p><b>${isEn ? 'Description:' : 'الشرح:'}</b> ${isEn ? ex.d.en : ex.d.ar}</p>
+                        <div style="margin-top:10px;">
+                            <a href="${ex.link}" target="_blank" class="btn-exam" style="background:var(--primary)">${isEn ? 'Official Website' : 'الموقع الرسمي'}</a>
+                            <a href="${ex.train}" target="_blank" class="btn-exam" style="background:var(--gold)">${isEn ? 'Practice Test' : 'موقع تجريبي'}</a>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        }
+
+        function toggleLang() {
+            isEn = !isEn;
+            document.body.classList.toggle('en-mode');
+            document.documentElement.dir = isEn ? 'ltr' : 'rtl';
+            document.querySelector('.lang-btn').innerText = isEn ? "عربي" : "English";
+            document.querySelectorAll('[data-ar]').forEach(el => el.innerText = isEn ? el.getAttribute('data-en') : el.getAttribute('data-ar'));
+            const cInput = document.getElementById('chatIn');
+            cInput.placeholder = isEn ? cInput.getAttribute('data-en-placeholder') : cInput.getAttribute('data-ar-placeholder');
+            renderLists();
+            if(qi >= questions.length && qi > 0) finish(); 
+        }
+
+        let qi = 0, sc = {R:0, I:0, A:0, S:0, E:0, C:0}, myChart;
+        function showM(id) { document.getElementById(id).style.display = 'flex'; }
+        function hideM(id) { document.getElementById(id).style.display = 'none'; }
+        function toggleC(id) { let e = document.getElementById(id); e.style.display = e.style.display === 'block' ? 'none' : 'block'; }
+
+        function startQuiz() {
+            qi = 0; sc = {R:0, I:0, A:0, S:0, E:0, C:0};
+            document.getElementById('quiz-box').style.display='block';
+            document.getElementById('q-res').style.display='none';
+            renderQ();
+        }
+
+        function renderQ() {
+            document.getElementById('q-bar').style.width = (qi/questions.length*100) + "%";
+            if(qi < questions.length) {
+                document.getElementById('q-text').innerText = isEn ? questions[qi].q.en : questions[qi].q.ar;
+                document.getElementById('q-options').innerHTML = `
+                    <button class="quiz-option" onclick="ans(2)">${isEn?'Yes':'نعم'}</button>
+                    <button class="quiz-option" style="border-color:#ccc" onclick="ans(0)">${isEn?'No':'لا'}</button>`;
+            } else { finish(); }
+        }
+        function ans(v) { sc[questions[qi].t]+=v; qi++; renderQ(); }
+
+        function finish() {
+            document.getElementById('quiz-box').style.display='none';
+            document.getElementById('q-res').style.display='block';
+            let maxKey = Object.keys(sc).reduce((a, b) => sc[a] > sc[b] ? a : b);
+            let result = analysisData[maxKey];
+            document.getElementById('analysis-text').innerHTML = `
+                <div class="res-type-title">${isEn ? result.title.en : result.title.ar}</div>
+                <p><b>${isEn ? 'Personal Analysis:' : 'تحليل شخصيتك:'}</b> ${isEn ? result.desc.en : result.desc.ar}</p>
+                <p><b>${isEn ? 'Recommended Majors:' : 'التخصصات المقترحة:'}</b> <span style="color:var(--emerald)">${isEn ? result.majors.en : result.majors.ar}</span></p>
+            `;
+            const ctx = document.getElementById('myChart').getContext('2d');
+            if(myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'radar',
+                data: { 
+                    labels: isEn ? ['Realistic', 'Investigative', 'Artistic', 'Social', 'Enterprising', 'Conventional'] : ['واقعي', 'استقصائي', 'فني', 'اجتماعي', 'مبادر', 'تقليدي'], 
+                    datasets: [{ label: isEn ? 'Interests' : 'الميول', data: Object.values(sc), backgroundColor: 'rgba(141,27,61,0.2)', borderColor: '#8D1B3D' }] 
+                }
+            });
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text("Qatar Compass - Career Report", 20, 20);
+            doc.text("Advisor: Mr. Saifuddin Bani Issa", 20, 30);
+            doc.save("my-path.pdf");
+        }
+
+        function toggleChat() { let c = document.getElementById('chatWin'); c.style.display = c.style.display === 'flex' ? 'none' : 'flex'; }
+        function sendMsg() {
+            const i = document.getElementById('chatIn'), m = document.getElementById('chatMsgs');
+            if(!i.value) return;
+            m.innerHTML += `<div><b>${isEn?'You':'أنت'}:</b> ${i.value}</div>`;
+            i.value = '';
+            setTimeout(() => { m.innerHTML += `<div style="color:var(--primary)"><b>AI:</b> ${isEn?'Advisor will reply soon.':'سيرد المستشار قريباً.'}</div>`; m.scrollTop = m.scrollHeight; }, 600);
+        }
+
+        window.onload = renderLists;
+    </script>
+</body>
+</html>
